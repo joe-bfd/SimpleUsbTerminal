@@ -174,14 +174,12 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         receiveText.setTextColor(getResources().getColor(R.color.colorRecieveText)); // set as default color to reduce number of spans
         receiveText.setMovementMethod(ScrollingMovementMethod.getInstance());
 
-        sendText = view.findViewById(R.id.send_text);
-        hexWatcher = new TextUtil.HexWatcher(sendText);
-        hexWatcher.enable(hexEnabled);
-        sendText.addTextChangedListener(hexWatcher);
-        sendText.setHint(hexEnabled ? "HEX mode" : "");
-
         View sendBtn = view.findViewById(R.id.send_btn);
         sendBtn.setOnClickListener(v -> send(sendText.getText().toString()));
+
+        View connectBtn = view.findViewById(R.id.connect_btn);
+        connectBtn.setOnClickListener(v -> sendATMode());
+
         controlLines = new ControlLines(view);
         return view;
     }
@@ -307,7 +305,16 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         service.disconnect();
         usbSerialPort = null;
     }
-
+    private void sendATMode() {
+       try {
+           byte[] data;
+           data = "+++".getBytes();
+           service.write(data);
+           Thread.sleep(1000);
+       } catch (Exception e) {
+           onSerialIoError(e);
+       }
+    }
     private void send(String str) {
         if(connected != Connected.True) {
             Toast.makeText(getActivity(), "not connected", Toast.LENGTH_SHORT).show();
