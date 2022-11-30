@@ -175,10 +175,11 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         receiveText.setMovementMethod(ScrollingMovementMethod.getInstance());
 
         View sendBtn = view.findViewById(R.id.send_btn);
-        sendBtn.setOnClickListener(v -> send(sendText.getText().toString()));
+        //sendBtn.setOnClickListener(v -> send(sendText.getText().toString()));
+        sendBtn.setOnClickListener(v -> sendATMode());
 
-        View connectBtn = view.findViewById(R.id.connect_btn);
-        connectBtn.setOnClickListener(v -> sendATMode());
+        //View connectBtn = view.findViewById(R.id.connect_btn);
+        //connectBtn.setOnClickListener(v -> sendATMode());
 
         controlLines = new ControlLines(view);
         return view;
