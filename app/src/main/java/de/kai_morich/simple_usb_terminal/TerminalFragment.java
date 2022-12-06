@@ -28,7 +28,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -43,6 +46,7 @@ import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.EnumSet;
 
@@ -176,11 +180,37 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
 
         View sendBtn = view.findViewById(R.id.send_btn);
         //sendBtn.setOnClickListener(v -> send(sendText.getText().toString()));
-        sendBtn.setOnClickListener(v -> sendATMode());
 
-        //View connectBtn = view.findViewById(R.id.connect_btn);
-        //connectBtn.setOnClickListener(v -> sendATMode());
 
+        TextView encryptionTxt = view.findViewById(R.id.encryption_txt);
+        CheckBox encryptionChk = view.findViewById(R.id.encryption_chk);
+        SeekBar txPowerBar = view.findViewById(R.id.tx_power_bar);
+        EditText netIDTxt = view.findViewById(R.id.net_id_txt);
+        TextView powerText;
+        powerText = view.findViewById(R.id.tx_power_txt);
+        txPowerBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                powerText.setText(Integer.toString(i)+" dB");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        encryptionChk.setOnClickListener(v -> {
+            if (encryptionChk.isChecked())
+                encryptionTxt.setVisibility(View.VISIBLE);
+            else
+                encryptionTxt.setVisibility(View.INVISIBLE);
+        });
+        sendBtn.setOnClickListener(v -> sendConfig(netIDTxt.getText().toString(), Integer.toString(txPowerBar.getProgress()), encryptionChk.isChecked(), encryptionTxt.getText().toString()));
         controlLines = new ControlLines(view);
         return view;
     }
@@ -306,16 +336,68 @@ public class TerminalFragment extends Fragment implements ServiceConnection, Ser
         service.disconnect();
         usbSerialPort = null;
     }
-    private void sendATMode() {
+
+    private void sendConfig(String netID, String txPower, boolean encryption, String encryptionKey) {
        try {
            byte[] data;
            data = "+++".getBytes();
            service.write(data);
            Thread.sleep(1000);
+// #################################################################################################
+           data = ("RTS3=" + netID + "\r\n").getBytes();
+           service.write(data);
+           Thread.sleep(100);
+
+           data = ("RTS4=" + txPower + "\r\n").getBytes();
+           service.write(data);
+           Thread.sleep(100);
+// #################################################################################################
+           data = ("ATS3=" + netID + "\r\n").getBytes();
+           service.write(data);
+           Thread.sleep(100);
+
+           data = ("ATS4=" + txPower + "\r\n").getBytes();
+           service.write(data);
+           Thread.sleep(100);
+
+           int encryptionMode = 0;
+           if (encryption) {
+               encryptionMode = 2;
+               data = ("RT&E=" + encryptionKey + "\r\n").getBytes();
+               service.write(data);
+               Thread.sleep(100);
+               data = ("AT&E=" + encryptionKey + "\r\n").getBytes();
+               service.write(data);
+               Thread.sleep(100);
+           }
+           data = ("RTS14=" + encryptionMode + "\r\n").getBytes();
+           service.write(data);
+           Thread.sleep(100);
+
+           data = ("ATS14=" + encryptionMode + "\r\n").getBytes();
+           service.write(data);
+           Thread.sleep(100);
+
+           data = "RT&W\r\n".getBytes();
+           service.write(data);
+           Thread.sleep(100);
+
+           data = "AT&W\r\n".getBytes();
+           service.write(data);
+           Thread.sleep(100);
+
+           data = "RTZ\r\n".getBytes();
+           service.write(data);
+           Thread.sleep(100);
+           data = "ATZ\r\n".getBytes();
+           service.write(data);
+           Thread.sleep(100);
+
        } catch (Exception e) {
            onSerialIoError(e);
        }
     }
+
     private void send(String str) {
         if(connected != Connected.True) {
             Toast.makeText(getActivity(), "not connected", Toast.LENGTH_SHORT).show();

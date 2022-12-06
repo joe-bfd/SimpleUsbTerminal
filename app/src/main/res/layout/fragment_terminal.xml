@@ -87,8 +87,8 @@
     <TextView
         android:id="@+id/receive_text"
         android:layout_width="match_parent"
-        android:layout_height="582dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_weight="6"
         android:freezesText="true"
         android:gravity="bottom"
         android:scrollbars="vertical"
@@ -110,30 +110,31 @@
             android:text="Net ID: " />
 
         <EditText
-            android:id="@+id/editTextNumber"
-            android:layout_width="159dp"
+            android:id="@+id/net_id_txt"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="number" />
 
         <CheckBox
-            android:id="@+id/checkBox"
+            android:id="@+id/encryption_chk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:checked="false"
             android:text="Encryption" />
 
     </LinearLayout>
 
     <EditText
-        android:id="@+id/txtEncryption"
+        android:id="@+id/encryption_txt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight=".2"
         android:ems="10"
         android:inputType="textPersonName"
         android:text="Encryption Key:"
-        android:visibility="visible" />
+        android:visibility="invisible" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -142,13 +143,13 @@
 
         <TextView
             android:id="@+id/textView5"
-            android:layout_width="11dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Tx Power" />
 
         <SeekBar
-            android:id="@+id/barTxPower"
+            android:id="@+id/tx_power_bar"
             android:layout_width="229dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -157,22 +158,25 @@
             android:progress="30" />
 
         <TextView
-            android:id="@+id/textView6"
+            android:id="@+id/tx_power_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="30" />
+            android:text="30 dB" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:orientation="horizontal">
 
-        <Space
+        <TextView
+            android:id="@+id/error_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:textColor="#F44336" />
 
         <ImageButton
             android:id="@+id/send_btn"
